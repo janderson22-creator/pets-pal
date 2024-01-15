@@ -36,16 +36,10 @@ model Pet {
   gender String
   species String
   posts Post[]
-  followers Pet[] @relation("PetFollowers", map: "followers")
-  following Pet[] @relation("PetFollowing", map: "following")
 
   // reference to user
   userId   String
   user     User   @relation(fields: [userId], references: [id])
-
-  // Add this field for the opposite relation
-  followersOf Pet[] @relation("PetFollowers", map: "followersOf")
-  followingOf Pet[] @relation("PetFollowing", map: "followingOf")
 }
 
 model Post {
@@ -107,8 +101,19 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  pets Pet[]
+  pets          Pet[]
+
+  // Seguidores
+  followers     User[] @relation("UserFollowers", map: "followers") // Adicionei o `map` aqui
+
+  // Seguindo
+  following     User[] @relation("UserFollowing", map: "following") // Adicionei o `map` aqui
+
+  // Relações Opostas
+  followersOf   User[] @relation("UserFollowers", map: "followersOf")
+  followingOf   User[] @relation("UserFollowing", map: "followingOf")
 }
+
 
 model VerificationToken {
   identifier String

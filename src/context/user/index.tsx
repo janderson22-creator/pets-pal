@@ -43,11 +43,26 @@ export const UserProvider: React.FC<ChildrenProps> = ({
     }
   }, [data?.user?.email]);
 
+  const fetchUserFollowers = useCallback(async () => {
+    try {
+      const response = await axios.get(`/api/user?id=${user?.id}`);
+      console.log(response);
+    } catch (error) {
+      console.error("Error to get user followers:", error);
+    }
+  }, [user?.id]);
+
   useEffect(() => {
     if (!data?.user?.email) return;
 
     fetchUser();
   }, [data, fetchUser]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    fetchUserFollowers();
+  }, [data, fetchUser, fetchUserFollowers, user?.id]);
 
   const value = useMemo(() => ({ user }), [user]);
 

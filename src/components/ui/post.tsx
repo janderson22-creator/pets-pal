@@ -5,6 +5,7 @@ import DropdownPost from "./dropdown-post";
 import Like from "../svg/like";
 import Comment from "../svg/comment";
 import { formatCreatedAt } from "@/utils/format-date";
+import { useUser } from "@/context/user";
   
 interface Props {
   post: PostType;

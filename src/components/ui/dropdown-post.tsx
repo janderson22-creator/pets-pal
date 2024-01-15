@@ -40,7 +40,7 @@ const DropdownPost: React.FC<Props> = ({ idPost, idPet }) => {
               <Trash className="mr-2 h-4 w-4" />
               <span>Excluir</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => console.log(pets)}>
+            <DropdownMenuItem>
               <Pencil className="mr-2 h-4 w-4" />
               <span>Editar</span>
             </DropdownMenuItem>
