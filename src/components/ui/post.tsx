@@ -6,7 +6,9 @@ import Like from "../svg/like";
 import Comment from "../svg/comment";
 import { formatCreatedAt } from "@/utils/format-date";
 import { useUser } from "@/context/user";
-  
+import Link from "next/link";
+import { usePet } from "@/context/pet";
+
 interface Props {
   post: PostType;
 }
@@ -16,16 +18,21 @@ const Post: React.FC<Props> = ({ post }) => {
 
   return (
     <div className="px-3 py-4">
-      <div className="flex gap-3">
-        <Avatar>
-          <AvatarFallback>{post.namePet.toUpperCase()}</AvatarFallback>
-          {post.imageUrl && <AvatarImage src={post.imageUrl} />}
-        </Avatar>
+      <div className="flex">
+        <Link
+          className="flex gap-3"
+          href={`/profile/${post.slug.toLocaleLowerCase()}`}
+        >
+          <Avatar>
+            <AvatarFallback>{post.namePet.toUpperCase()}</AvatarFallback>
+            {post.imageUrl && <AvatarImage src={post.imageUrl} />}
+          </Avatar>
 
-        <div className="flex flex-col">
-          <p className="text-base font-medium">{post.namePet}</p>
-          <p className="text-xs opacity-60">@{post.slug}</p>
-        </div>
+          <div className="flex flex-col">
+            <p className="text-base font-medium">{post.namePet}</p>
+            <p className="text-xs opacity-60">@{post.slug}</p>
+          </div>
+        </Link>
 
         <DropdownPost idPost={post.id} idPet={post.petId} />
       </div>

@@ -17,18 +17,7 @@ export type ContextValue = {
   ) => Promise<void>;
   postPublication: (data: Post) => Promise<void>;
   fetchPublications: () => Promise<void>;
-  posts:
-    | {
-        id: string;
-        text: string;
-        namePet: string;
-        imageUrl: string;
-        slug: string;
-        likes: number;
-        createdAt: Date;
-        petId: string;
-      }[]
-    | undefined;
+  posts: Post[] | undefined;
 };
 
 export const PostContext = React.createContext<ContextValue | undefined>(

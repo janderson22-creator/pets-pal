@@ -5,64 +5,97 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Skeleton } from "@/components/ui/skeleton";
 import { usePet } from "@/context/pet";
 import { useUser } from "@/context/user";
 import { cn } from "@/lib/utils";
 import { Pencil, Settings, Trash } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const PetProfile = () => {
-  const { currentPet, deletePet } = usePet();
+  const pathname = usePathname();
+  const slug = pathname.split("/").pop();
+  const { currentPet, deletePet, fetchPetBySlug, loadingPet } = usePet();
   const { user } = useUser();
   const [showButtonsConfig, setShowButtonsConfig] = useState(false);
+
+  useEffect(() => {
+    fetchPetBySlug(slug);
+  }, [fetchPetBySlug, slug]);
 
   return (
     <div>
       <div className="relative">
-        {currentPet?.imageUrl && (
+        {loadingPet ? (
+          <Skeleton className="h-[96px] max-h-[135px] w-full rounded-lg" />
+        ) : currentPet?.backgroundURL ? (
           <Image
             alt="background-pet"
-            src={currentPet.backgroundURL}
+            src={currentPet?.backgroundURL}
             width={0}
             height={0}
             sizes="100vw"
-            className="h-full max-h-[135px] w-full rounded-lg object-contain"
+            className="h-full max-h-[135px] min-h-[96px] w-full rounded-lg object-contain"
           />
+        ) : (
+          <div className="max-h-[135px] min-h-[96px]" />
         )}
 
-        <Avatar className="absolute left-0 right-0 top-14 mx-auto h-[100px] w-[100px] border-[4px]">
-          <AvatarFallback>{currentPet?.name.toUpperCase()}</AvatarFallback>
+        {loadingPet ? (
+          <Skeleton className="absolute left-0 right-0 top-14 mx-auto h-[100px] w-[100px] rounded-full border-[4px]" />
+        ) : (
+          <Avatar className="absolute left-0 right-0 top-14 mx-auto h-[100px] w-[100px] border-[4px]">
+            <AvatarFallback>{currentPet?.name.toUpperCase()}</AvatarFallback>
 
-          {currentPet?.imageUrl && <AvatarImage src={currentPet?.imageUrl} />}
-        </Avatar>
+            {currentPet?.imageUrl && <AvatarImage src={currentPet?.imageUrl} />}
+          </Avatar>
+        )}
       </div>
 
       <div className="flex flex-col items-center justify-center pt-20">
-        <p className="text-2xl font-medium tracking-wider">
-          {currentPet?.name}
-        </p>
-        <p className="text-xs font-normal opacity-80">
-          {currentPet?.description}
-        </p>
+        {loadingPet ? (
+          <div className="flex flex-col items-center space-y-2">
+            <Skeleton className="h-6 w-[200px]" />
+            <Skeleton className="h-4 w-[100px]" />
+          </div>
+        ) : (
+          <div className="flex flex-col items-center">
+            <p className="text-2xl font-medium tracking-wider">
+              {currentPet?.name}
+            </p>
+            <p className="text-xs font-normal opacity-80">
+              {currentPet?.description}
+            </p>
+          </div>
+        )}
       </div>
 
-      <div className="mt-10 flex items-center gap-4 px-2.5 text-sm font-medium">
-        <p className="w-fit border-b border-[#FBD157] pb-1.5">Meus Posts</p>
+      <div className="mt-10">
+        {loadingPet ? (
+          <div className="flex items-center gap-3 px-2.5">
+            <Skeleton className="h-4 w-[70px]" />
+            <Skeleton className="h-4 w-[50px]" />
+            <Skeleton className="h-4 w-[50px]" />
+          </div>
+        ) : (
+          <div className="flex items-center gap-4 px-2.5 text-sm font-medium">
+            <p className="w-fit border-b border-[#FBD157] pb-1.5">Meus Posts</p>
 
-        <p className="w-fit cursor-not-allowed border-b pb-1.5 opacity-40">
-          Likes
-        </p>
-        <p className="w-fit cursor-not-allowed border-b pb-1.5 opacity-40">
-          Fotos
-        </p>
+            <p className="w-fit cursor-not-allowed border-b pb-1.5 opacity-40">
+              Likes
+            </p>
+            <p className="w-fit cursor-not-allowed border-b pb-1.5 opacity-40">
+              Fotos
+            </p>
+          </div>
+        )}
       </div>
 
       <div className={cn("fixed bottom-10 right-8 flex flex-col items-center")}>
@@ -104,7 +137,7 @@ const PetProfile = () => {
           </Sheet>
         </div>
 
-        {currentPet?.userId === user?.id && (
+        {currentPet && currentPet?.userId === user?.id && (
           <button
             onClick={() => setShowButtonsConfig(!showButtonsConfig)}
             className="z-10 flex h-[50px] w-[50px] cursor-pointer items-center justify-center rounded-full bg-[#FBD157] shadow-lg"

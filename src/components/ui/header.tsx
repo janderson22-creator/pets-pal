@@ -27,10 +27,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Separator } from "./separator";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { usePet } from "@/context/pet";
 
 const Header = () => {
   const { status, data } = useSession();
   const [loading, setLoading] = useState(true);
+  const { setCurrentPet } = usePet();
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -105,7 +107,7 @@ const Header = () => {
             )}
 
             <SheetClose asChild>
-              <Link href="/">
+              <Link onClick={() => setCurrentPet(undefined)} href="/">
                 <Button
                   variant="outline"
                   className="w-full justify-start gap-2"
@@ -119,6 +121,7 @@ const Header = () => {
             {data && (
               <SheetClose asChild>
                 <Link
+                  onClick={() => setCurrentPet(undefined)}
                   href={`/profile`}
                 >
                   <Button

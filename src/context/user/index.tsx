@@ -12,15 +12,7 @@ import React, {
 } from "react";
 
 export type ContextValue = {
-  user:
-    | {
-        id: string;
-        name: string | null;
-        email: string | null;
-        emailVerified: Date | null;
-        image: string | null;
-      }
-    | undefined;
+  user: User | undefined;
 };
 
 export const UserContext = React.createContext<ContextValue | undefined>(
@@ -46,7 +38,7 @@ export const UserProvider: React.FC<ChildrenProps> = ({
   const fetchUserFollowers = useCallback(async () => {
     try {
       const response = await axios.get(`/api/user?id=${user?.id}`);
-      console.log(response);
+      // console.log(response);
     } catch (error) {
       console.error("Error to get user followers:", error);
     }

@@ -1,8 +1,7 @@
 "use client";
 
-import { Pet, User } from "@prisma/client";
+import { Pet } from "@prisma/client";
 import axios from "axios";
-import { useSession } from "next-auth/react";
 import React, {
   useCallback,
   useContext,
@@ -13,78 +12,16 @@ import React, {
 import { useUser } from "../user";
 
 export type ContextValue = {
+  fetchPetBySlug: (slug: string | undefined) => Promise<void>;
   postPet: (petData: Pet) => Promise<void>;
   deletePet: () => Promise<void>;
-  pets:
-    | {
-        id: string;
-        name: string;
-        slug: string;
-        imageUrl: string;
-        backgroundURL: string;
-        description: string;
-        userId: string;
-      }[]
-    | undefined;
-  setCurrentPet: React.Dispatch<
-    React.SetStateAction<
-      | {
-          id: string;
-          name: string;
-          slug: string;
-          imageUrl: string;
-          backgroundURL: string;
-          description: string;
-          gender: string;
-          species: string;
-          userId: string;
-        }
-      | undefined
-    >
-  >;
-  currentPet:
-    | {
-        id: string;
-        name: string;
-        slug: string;
-        imageUrl: string;
-        backgroundURL: string;
-        description: string;
-        gender: string;
-        species: string;
-        userId: string;
-      }
-    | undefined;
-  setCurrentPetPost: React.Dispatch<
-    React.SetStateAction<
-      | {
-          id: string;
-          name: string;
-          slug: string;
-          imageUrl: string;
-          backgroundURL: string;
-          description: string;
-          gender: string;
-          species: string;
-          userId: string;
-        }
-      | undefined
-    >
-  >;
-  currentPetPost:
-    | {
-        id: string;
-        name: string;
-        slug: string;
-        imageUrl: string;
-        backgroundURL: string;
-        description: string;
-        gender: string;
-        species: string;
-        userId: string;
-      }
-    | undefined;
+  pets: Pet[] | undefined;
+  setCurrentPet: React.Dispatch<React.SetStateAction<Pet | undefined>>;
+  currentPet: Pet | undefined;
+  setCurrentPetPost: React.Dispatch<React.SetStateAction<Pet | undefined>>;
+  currentPetPost: Pet | undefined;
   loadingPets: boolean;
+  loadingPet: boolean;
 };
 
 export const PetContext = React.createContext<ContextValue | undefined>(
@@ -93,6 +30,7 @@ export const PetContext = React.createContext<ContextValue | undefined>(
 
 export const PetProvider: React.FC<ChildrenProps> = ({ children, ...rest }) => {
   const { user } = useUser();
+  const [loadingPet, setLoadingPet] = useState(false);
   const [pets, setPets] = useState<Pet[]>();
   const [currentPet, setCurrentPet] = useState<Pet>();
   const [currentPetPost, setCurrentPetPost] = useState<Pet>();
@@ -110,6 +48,20 @@ export const PetProvider: React.FC<ChildrenProps> = ({ children, ...rest }) => {
       setLoadingPets(false);
     }
   }, [user?.id]);
+
+  const fetchPetBySlug = useCallback(async (slug: string | undefined) => {
+    if (!slug) return;
+    setLoadingPet(true);
+    try {
+      const response = await axios.get(`/api/pet/get?slug=${slug}`);
+
+      setCurrentPet(response.data.pets[0]);
+    } catch (error) {
+      console.error("Error to get pet:", error);
+    } finally {
+      setLoadingPet(false);
+    }
+  }, []);
 
   const postPet = useCallback(
     async (petData: Pet) => {
@@ -152,6 +104,8 @@ export const PetProvider: React.FC<ChildrenProps> = ({ children, ...rest }) => {
       deletePet,
       currentPetPost,
       setCurrentPetPost,
+      fetchPetBySlug,
+      loadingPet,
     }),
     [
       setCurrentPet,
@@ -162,6 +116,8 @@ export const PetProvider: React.FC<ChildrenProps> = ({ children, ...rest }) => {
       deletePet,
       currentPetPost,
       setCurrentPetPost,
+      fetchPetBySlug,
+      loadingPet,
     ],
   );
 
